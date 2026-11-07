@@ -67,7 +67,7 @@ module apb_slave_interface  # (parameter APB_ADDR_WIDTH = 12)
       apb_reg_wdata <= apb_pwdata_i;
       apb_reg_wrenable <= apb_psel_i & apb_penable_i & apb_pwrite_i & pready_reg;
       pready_reg <= apb_psel_i & apb_penable_i;
-      apb_reg_rd_byte_complete <= apb_psel_i & apb_penable_i & !apb_pwrite_i;
+      apb_reg_rd_byte_complete <= apb_psel_i & apb_penable_i & !apb_pwrite_i & !pready_reg;
     end
   end
 

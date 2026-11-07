@@ -150,7 +150,7 @@ module udma_i2c_reg_if #(
                     r_rx_size        <= cfg_data_i[TRANS_SIZE-1:0];
                 `I2C_REG_RX_CFG:
                 begin
-                    r_rx_clr          = cfg_data_i[5];
+                    r_rx_clr          = cfg_data_i[6];
                     r_rx_en           = cfg_data_i[4];
                     r_rx_continuous  <= cfg_data_i[0];
                 end
@@ -160,7 +160,7 @@ module udma_i2c_reg_if #(
                     r_tx_size        <= cfg_data_i[TRANS_SIZE-1:0];
                 `I2C_REG_TX_CFG:
                 begin
-                    r_tx_clr          = cfg_data_i[5];
+                    r_tx_clr          = cfg_data_i[6];
                     r_tx_en           = cfg_data_i[4];
                     r_tx_continuous  <= cfg_data_i[0];
                 end

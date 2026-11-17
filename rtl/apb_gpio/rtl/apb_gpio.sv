@@ -101,6 +101,7 @@ module apb_gpiov2 #(
 
   always_ff @(posedge HCLK, negedge HRESETn) begin
     if (~HRESETn) begin
+      r_gpio_out <= '0;
       r_gpio_dir <= '0;
       r_gpio_inttype <= '0;
       r_gpio_select <= '0;

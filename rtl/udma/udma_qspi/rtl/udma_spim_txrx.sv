@@ -637,7 +637,11 @@ module udma_spim_txrx
         else
         begin
         	r_rx_clken     <= s_rx_clken;
-            r_rx_shift_reg <= s_rx_shift_reg;
+            // Start each receive command from zero so narrow words carry no bits of the previous one
+            if (s_sample_rx_in)
+                r_rx_shift_reg <= 'h0;
+            else
+                r_rx_shift_reg <= s_rx_shift_reg;
             r_tx_shift_reg <= s_tx_shift_reg;
 
             if(s_tx_sample_bits)

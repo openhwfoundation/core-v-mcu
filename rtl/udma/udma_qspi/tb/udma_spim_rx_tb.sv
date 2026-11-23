@@ -30,6 +30,7 @@ module udma_spim_rx_tb;
     int received;
     int errors = 0;
     int cases = 0;
+    bit keep_state = 1'b0;
 
     always #5 clk = ~clk;
 
@@ -125,7 +126,8 @@ module udma_spim_rx_tb;
     task automatic receive_words(input int mode, input bit quad, input bit lsbfirst,
                                  input int nbits, input int packing);
         active = 1'b0;
-        rstn = 1'b0;
+        if (!keep_state)
+            rstn = 1'b0;   // keep_state: back-to-back commands, no reset
         start = 1'b0;
         cpol = 1'(mode >> 1);
         cpha = 1'(mode);
@@ -168,6 +170,16 @@ module udma_spim_rx_tb;
                     receive_words(mode, 1'(quad), 1'(order), 16, 1);
                     receive_words(mode, 1'(quad), 1'(order), 16, 2);
                     receive_words(mode, 1'(quad), 1'(order), 32, 1);
+                end
+        // Narrow words after wide ones, without a reset in between.
+        keep_state = 1'b1;
+        for (int mode = 0; mode < 4; mode++)
+            for (int quad = 0; quad < 2; quad++)
+                for (int order = 0; order < 2; order++) begin
+                    receive_words(mode, 1'(quad), 1'(order), 32, 1);
+                    receive_words(mode, 1'(quad), 1'(order), 8, 1);
+                    receive_words(mode, 1'(quad), 1'(order), 16, 1);
+                    receive_words(mode, 1'(1 - quad), 1'(1 - order), 8, 1);
                 end
         if (errors != 0)
             $fatal(1, "%0d receive mismatches in %0d cases", errors, cases);

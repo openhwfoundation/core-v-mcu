@@ -123,9 +123,44 @@ module camera_vsync_tb;
         $display("VSYNC_POLARITY=%0b received_pixels=%0d", polarity, received);
     endtask
 
+    task automatic check_enable_during_vsync(input logic polarity);
+        @(negedge cam_clk);
+        rstn  = 1'b0;
+        vsync = polarity;
+        repeat (4) @(negedge cam_clk);
+        rstn = 1'b1;
+
+        write_csr(5'h02, 32'h12);       // RX: halfword
+        if (polarity)
+            write_csr(5'h0d, 32'h1);
+        repeat (5) @(negedge cam_clk);
+        // Enabling while VSYNC is already asserted must not start a frame.
+        write_csr(5'h08, 32'h80000400); // Enable, BYPASS_LITEND
+        repeat (20) @(negedge cam_clk);
+        send_pixel(16'hdead);
+        if (received != 0) begin
+            $display("FAIL: polarity=%0b captured %0d pixel(s) of the frame in progress", polarity, received);
+            failures++;
+        end
+
+        vsync = ~polarity;
+        repeat (5) @(negedge cam_clk);
+        vsync = polarity;
+        repeat (5) @(negedge cam_clk);
+        send_pixel(16'h5678);
+        if (received != 1 || last_pixel !== 16'h5678) begin
+            $display("FAIL: polarity=%0b expected only 5678 after enabling during VSYNC, received=%0d last=%04x",
+                     polarity, received, last_pixel);
+            failures++;
+        end
+        $display("VSYNC_POLARITY=%0b enabled during VSYNC, received_pixels=%0d", polarity, received);
+    endtask
+
     initial begin
         check_polarity(1'b0);
         check_polarity(1'b1);
+        check_enable_during_vsync(1'b0);
+        check_enable_during_vsync(1'b1);
         if (failures != 0)
             $fatal(1, "camera VSYNC polarity regression: %0d failure(s)", failures);
         $display("PASS: camera capture waits for active-low and active-high VSYNC");

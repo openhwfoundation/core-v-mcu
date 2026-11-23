@@ -355,8 +355,8 @@ module camera_if
         if(~rstn_i) begin
             r_vsync     <= 0;
         end else begin
-            if(r_en_sync[1])
-                r_vsync     <= s_cam_vsync;
+            // Track VSYNC while disabled too, so enabling during an assertion waits for the next one
+            r_vsync     <= s_cam_vsync;
         end
     end
 

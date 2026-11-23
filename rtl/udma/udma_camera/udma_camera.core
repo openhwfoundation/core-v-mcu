@@ -16,8 +16,13 @@ filesets:
   files_vsync_test:
     depend:
     - openhwgroup.org:ip:udma_core
-    - openhwgroup.org:ip:logint_dc_fifo_xbar
     files:
+    - ../../logint_dc_fifo_xbar/dc_data_buffer.sv
+    - ../../logint_dc_fifo_xbar/dc_full_detector.v
+    - ../../logint_dc_fifo_xbar/dc_synchronizer.v
+    - ../../logint_dc_fifo_xbar/dc_token_ring_fifo_din.v
+    - ../../logint_dc_fifo_xbar/dc_token_ring_fifo_dout.v
+    - ../../logint_dc_fifo_xbar/dc_token_ring.v
     - ../../vendor/pulp_platform_common_cells/src/onehot_to_bin.sv
     - tb/camera_vsync_tb.sv
     file_type: systemVerilogSource
